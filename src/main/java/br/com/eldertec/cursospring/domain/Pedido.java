@@ -156,7 +156,7 @@ public class Pedido implements Serializable {
 		for (ItemPedido ip : getItens()) {
 			builder.append(ip.toString());
 		}
-		builder.append(", Valor Total: ");
+		builder.append("Valor Total: ");
 		builder.append(nf.format(getValorTotal()));
 		return builder.toString();
 	}

@@ -15,11 +15,14 @@ import org.springframework.transaction.annotation.Transactional;
 import br.com.eldertec.cursospring.domain.Cidade;
 import br.com.eldertec.cursospring.domain.Cliente;
 import br.com.eldertec.cursospring.domain.Endereco;
+import br.com.eldertec.cursospring.domain.enums.Perfil;
 import br.com.eldertec.cursospring.domain.enums.TipoCliente;
 import br.com.eldertec.cursospring.dto.ClienteDTO;
 import br.com.eldertec.cursospring.dto.ClienteNewDTO;
 import br.com.eldertec.cursospring.repositories.ClienteRepository;
 import br.com.eldertec.cursospring.repositories.EnderecoRepository;
+import br.com.eldertec.cursospring.security.UserSS;
+import br.com.eldertec.cursospring.services.exceptions.AuthorizationException;
 import br.com.eldertec.cursospring.services.exceptions.DataIntegrityException;
 import br.com.eldertec.cursospring.services.exceptions.ObjectNotFoundException;
 
@@ -36,6 +39,12 @@ public class ClienteService {
 	private BCryptPasswordEncoder pe;
 
 	public Cliente find(Integer id) {
+		
+		UserSS user = UserService.authenticated();
+		if(user == null || !user.hasRole(Perfil.ADMIN) && !id.equals(user.getId())) {
+			throw new AuthorizationException("Acesso Negado");
+		}
+		
 		Optional<Cliente> obj = repo.findById(id);
 		return obj.orElseThrow(() -> new ObjectNotFoundException(
 				"Objeto não encontrado! Id: " + id + ", Tipo: " + Cliente.class.getName()));
